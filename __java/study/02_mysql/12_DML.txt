@@ -1,0 +1,61 @@
+create table if not exists emp_test
+as select * from emp;
+
+select * from emp_test;
+desc emp_test;
+
+create table if not exists dept_test
+as select * from dept;
+
+-- insert 
+insert into emp_test 
+values (5000, 'KIM', 'Tester', 7839, now(), 2200, null, 50);
+select * from emp_test;
+-- 컬럼 지정 순서대로 값도 매칭이 되어야 함
+insert into emp_test (ename, mgr, empno, sal)
+values ('Park', 5000, 5500, 2100);
+select * from emp_test;
+-- 참조한 데이터 입력
+insert into emp_test (empno, mgr, sal)
+select empno+1, mgr, sal+50 from emp_test where deptno = 50;
+select * from emp_test;
+-- 다중 입력 쿼리 : 벤더마다 다름
+insert into emp_test (empno, sal)
+values (6000, 1200), (7000, 1300), (8000, 1400);
+select * from emp_test;
+
+-- update 
+update emp_test set
+ename = 'LEE', job = 'Tester', deptno = 50
+where empno = 7000;
+select * from emp_test;
+
+-- 멀티 업데이터
+update emp_test set
+deptno = 90 where deptno is null;
+select * from emp_test;
+
+-- 조건절에 서브쿼리 사용 업데이터
+update emp_test set comm = 100
+where sal > (select avg(sal) from emp where deptno = 10);
+select * from emp_test;
+
+-- set 절에 서브쿼리 사용 업데이터
+update emp_test 
+set comm = (select round(avg(sal)) from emp where deptno = 30)
+where deptno = 90;
+select * from emp_test;
+
+-- delete 
+delete from emp_test where deptno = 50;
+select * from emp_test;
+
+delete from emp_test
+where sal in (select sal from emp where deptno=10);
+select * from emp_test;
+
+delete from emp_test 
+where empno
+in (select empno from emp e join salgrade s 
+		on e.sal between s.LOSAL and s.HISAL);
+select * from emp_test;

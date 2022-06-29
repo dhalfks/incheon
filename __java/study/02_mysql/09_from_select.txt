@@ -1,0 +1,37 @@
+-- subQuery를 이용한 insert, create
+select * from emp_test;
+
+-- select를 활용하여 insert를 할 경우
+-- 컬럼의 순서와 데이터타입, 제약조건을 반드시 체크해야 함
+insert into emp_test (empno)
+select empno from emp;
+
+desc emp;
+desc emp_test;
+
+-- pk 조건에 위배됨
+insert into emp (empno)
+select empno from emp_test;
+
+insert into emp (empno, ENAME)
+select empno, ename from emp where deptno = 30;
+
+-- 더미데이터 쌓기
+insert into emp_test (empno, ename)
+select empno + 1, concat('mr.',ename) from emp_test;
+
+select count(empno) from emp_test;
+
+select * from emp_test;
+
+-- select로 테이블 생성하기
+create table if not exists dept_dummy
+as select deptno, loc, dname from dept where deptno > 20;
+
+-- 복제한 테이블은 key 제약조건은 복제되지 않는다
+select * from dept_dummy;
+
+drop table emp_test;
+drop table dept_test;
+drop table dept_dummy;
+desc dept_dummy;

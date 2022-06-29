@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz 7</title>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    table {
+      /* border: 1px solid black; */
+      border-collapse: collapse;
+      width: 100%;
+      text-align: center;
+    }
+    td, th {
+      table-layout: fixed;
+      border: 1px solid black;
+      /* border-right: 1px solid black; */
+    }
+    td:first-child, td:last-child {
+      width: 10%;
+    }
+    td:nth-child(2), td:nth-child(3) {
+      width: 40%;
+    }
+    .control {
+      margin: 20px 0px;
+      border: 1px solid black;
+      padding: 10px;
+      font-size: 1.5em;
+      font-weight: bold;
+      position: relative;
+    }
+    .control button:last-child {
+      float: right;
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+    }
+    .control button {
+      margin-left: 5px;
+      padding: 5px 10px;
+      font-size: 0.6em;
+    }
+    .control input {
+      margin-top: 5px;
+      padding: 5px;
+      font-size: 0.6em;
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    Q7. 호텔 객실 관리 프로그램 만들기
+  </h1>
+  <!-- <ul>
+    <li>
+      5층, 각 층당 10호실, 총 50개의 객실보유한 호텔
+    </li>
+    <li>
+      메뉴버튼 > 객실현황보기, 입실, 퇴실, 초기화 > 클릭하면 기능 수행
+    </li>
+    <li>
+      관리할 호수 입력받고 각 기능 버튼을 클릭하는 프로세스 (간단하게 만들 수 있는 형태)
+    </li>
+    <li>
+      객실현황보기 버튼 > 방번호, 입실시간, 퇴실처리시간, 사용중 or 빈방 이라는 정보 출력
+    </li>
+    <li>
+      입실 > 사용중이면 입실불가, 빈방이면 입실완료 후 방정보 변경처리
+    </li>
+    <li>
+      퇴실 > 빈방이면 퇴실불가, 사용중이면 퇴실완료 후 방정보 변경처리
+    </li>
+    <li>
+      초기화 > 모든 방정보를 리셋
+    </li>
+  </ul> -->
+  <div class="container">
+    <p class="control">
+      투숙객 관리<br>
+      <input type="number" id="roomNum" placeholder="객실번호 입력"><button id="checkIn">입실</button><button id="checkOut">퇴실</button><button id="overAllBtn">객실현황보기</button><button id="resetBtn">초기화</button>
+    </p>
+    <table id="printArea" style="display: none;">
+      <tr>
+        <th>객실번호</th>
+        <th>입실시간</th>
+        <th>퇴실시간</th>
+        <th>객실상태</th>
+      </tr>
+    </table>
+  </div>
+  <script>
+
+    const hotelNow = new Map();
+    function init() {
+      for (let i = 1; i < 6; i++) {
+        for (let j = 1; j < 11; j++) {
+          hotelNow.set(`${i*100+j}`, {cih:'', coh:'', rs:0})
+        }
+        changeStatus();
+      }
+    }
+    init();
+    function changeStatus() {
+      document.getElementById('printArea').innerHTML = `<tr><th>객실번호</th><th>입실시간</th><th>퇴실시간</th><th>객실상태</th></tr>`;
+      hotelNow.forEach(function(val,key){
+        let rs = '';
+        if (val.rs == 0) {
+          rs = `<td>빈 객실</td>`
+        } else {
+          rs = `<td style="color: red; font-weight: bold;">사용중</td>`
+        }
+        document.getElementById('printArea').innerHTML += `<tr><td>${key}</td><td>${val.cih}</td><td>${val.coh}</td>${rs}</tr>`
+      });
+    }
+    document.getElementById('checkIn').addEventListener('click', function(){
+      let rn = document.getElementById('roomNum').value;
+      let now = new Date();
+      let now1 = `${now.getFullYear()}-${("00" + (now.getMonth()+1).toString()).slice(-2)}-${("00" + (now.getDate()).toString()).slice(-2)} ${("00" + (now.getHours()).toString()).slice(-2)}:${("00" + (now.getMinutes()).toString()).slice(-2)}:${("00" + (now.getSeconds()).toString()).slice(-2)}`
+      if (hotelNow.has(`${rn}`)) {
+        if (hotelNow.get(`${rn}`).rs == 0) {
+          hotelNow.set(`${rn}`, {cih: now1, coh: '', rs: 1});
+          document.getElementById('roomNum').value = '';
+          alert('입실처리 되었습니다.');
+        } else {
+          alert('사용중인 객실이므로 입실할 수 없습니다.');
+          return false;
+        }
+        changeStatus();
+      } else {
+        alert('객실번호를 정확히 입력해 주세요');
+        return false;
+      };
+    });
+    document.getElementById('checkOut').addEventListener('click', function(){
+      let rn = document.getElementById('roomNum').value;
+      let now = new Date();
+      let now1 = `${now.getFullYear()}-${("00" + (now.getMonth()+1).toString()).slice(-2)}-${("00" + (now.getDate()).toString()).slice(-2)} ${("00" + (now.getHours()).toString()).slice(-2)}:${("00" + (now.getMinutes()).toString()).slice(-2)}:${("00" + (now.getSeconds()).toString()).slice(-2)}`
+      if (hotelNow.has(`${rn}`)) {
+        if (hotelNow.get(`${rn}`).rs == 1) {
+          hotelNow.set(`${rn}`, {cih: '', coh: now1, rs: 0})
+          document.getElementById('roomNum').value = '';
+          alert('퇴실처리 되었습니다.')
+        } else {
+          alert('현재 빈 객실이므로 퇴실할 수 없습니다.')
+          return false;
+        }
+        changeStatus();
+      } else {
+        alert('객실번호를 정확히 입력해 주세요');
+        return false;
+      };
+    });
+    document.getElementById('resetBtn').addEventListener('click', function(){
+      alert('초기화 되었습니다.')
+      document.getElementById('roomNum').value = '';
+      hotelNow.clear();
+      init();
+    });
+    document.getElementById('overAllBtn').addEventListener('click', function (){
+      let hide = document.getElementById('printArea');
+      if (hide.style.display == 'none') {
+        hide.style.display = '';
+      } else {
+        hide.style.display = 'none';
+      }
+    });
+    </script>
+</body>
+</html>

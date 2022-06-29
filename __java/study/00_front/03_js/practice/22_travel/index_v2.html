@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1>Travel</h1>
+    <ul>
+        <li><a id="home" class="links">Home</a></li>
+        <li><a id="seoul" class="links">Seoul</a></li>
+        <li><a id="tokyo" class="links">Tokyo</a></li>
+        <li><a id="paris" class="links last">Paris</a></li>        
+    </ul>
+    <img src="images/home.jpg" alt="Home" id="cityImg">
+    <script>
+      document.addEventListener('click', (e) => {
+          // let idVal = e.target.id;
+          // let clsVal = e.target.classList[0];
+          let clsVal = e.target.classList.contains('links'); // true or false
+
+          if (clsVal) {
+            // console.log(idVal);
+            document.getElementById('cityImg').src = `images/${e.target.id}.jpg`;
+          }
+        
+      });
+        const clickCity = (elem) => {
+            let clsVal = elem.classList[0];
+            console.log(clsVal);
+            // document.getElementById(idVal).style.fontWeight = 'bold';
+        }
+    </script>
+</body>
+</html>

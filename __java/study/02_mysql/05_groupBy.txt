@@ -1,0 +1,93 @@
+-- group by : 특정 데이터로 묶음, having: 묶은 데이터에 조건을 부여
+select * from emp;
+
+select * from emp where deptno != 40;
+
+select * from emp where deptno != 40
+group by deptno; -- 그룹으로 묶은 후 로우의 형태가 바뀜
+
+select deptno, sal from emp where deptno != 40
+group by deptno; -- 그룹으로 묶은 후 그룹과 매칭되는 로우가 필요함
+
+-- 집계된 데이터를 표현 할 수 있는지 여부의 판단이 중요함
+-- 집계함수가 사용되는 이유이기도 함
+select deptno, count(empno)
+from emp
+where deptno != 40
+group by deptno;
+
+select deptno, sum(sal), round(avg(SAL))
+from emp
+where deptno != 40
+group by deptno;
+
+-- 회장과 매니저를 제외한 일반사원들의 인원, 총급여, 평균을 출력해보세요
+select deptno, count(EMPNO), sum(SAL), avg(sal) -- 4
+from emp -- 1
+where job not in ('MANAGER', 'PRESIDENT') -- 2
+group by deptno; -- 3
+
+-- 위의 출력결과에서 총급여가 2000이상인 데이터만 출력해보세요
+select deptno, count(EMPNO), sum(SAL), avg(sal) -- 5
+from emp -- 1
+where job not in ('MANAGER', 'PRESIDENT') -- 2
+group by deptno -- 3
+having sum(SAL) >= 2000; -- 4
+
+-- 위의 출력결과에서 총급여가 2000이상인 데이터를 평균급여 낮은 순으로 출력해보세요
+select deptno, count(EMPNO), sum(SAL), avg(sal) as avg_sal-- 5
+from emp -- 1
+where job not in ('MANAGER', 'PRESIDENT') -- 2
+group by deptno -- 3
+having sum(SAL) >= 2000 -- 4
+order by avg_sal; -- 6
+
+-- 05_groupBy_Q3
+select year(HIREDATE), deptno, count(EMPNO) as CNT
+from emp
+group by year(HIREDATE), deptno
+order by 1 desc; 
+
+-- 05_groupBy_Q4
+-- 추가수당을 받는 사원수와 받지 않는 수를 출력하세요. 기준 EXIST_COMM 컬럼 => X, O
+select if(comm is null, 'X', 'O') as EXIST_COMM,
+count(EMPNO) as CNT
+from emp 
+group by if(comm is null, 'X', 'O'); -- ORACLE : NVL2(data,true,false)
+
+-- 소계, 총계 : with rollup
+-- 소계 총계 데이터 여부 표시 : grouping(col_name)[MySQL 8 부터]
+select job, avg(sal)
+from emp
+group by job;
+
+select job, avg(sal)
+from emp
+group by job with rollup;
+
+-- 연산의 차이는 존재함
+select job, avg(sal)
+from emp
+group by job
+union
+select "total_avg", avg(a.avg_sal)
+from (select job, avg(sal) as avg_sal
+from emp group by job) a;
+
+-- 멀티 소계, 총계
+select year(HIREDATE), deptno, count(EMPNO) as CNT
+from emp
+group by year(HIREDATE), deptno with rollup
+order by 1 desc; 
+
+-- 멀티 소계, 총계 구분 확인 데이터 - grouping() 함수사용 :MySQL 8 이상부터!
+select year(HIREDATE), deptno, count(EMPNO) as CNT, grouping(deptno)
+from emp
+group by year(HIREDATE), deptno with rollup
+order by 1 desc; 
+
+-- 05_groupBy_Q5
+select  deptno, year(HIREDATE), count(EMPNO) as CNT,
+max(SAL), sum(SAL), avg(SAL)
+from emp
+group by deptno, year(HIREDATE) with rollup; 

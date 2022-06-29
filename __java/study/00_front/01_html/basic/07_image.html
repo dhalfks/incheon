@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이미지 태그</title>
+</head>
+<body>
+    <h3><a href="../index.html">상위 폴더로 돌아가기</a></h3>
+    <!-- 주석처리 할 부분을 선택후 ctrl + / : 주석처리,해제 -->
+    <!-- ctrl + alt + 상하 방향키 : 라인복사 -->
+    <h1>이미지 태크 inline 속성을 갖는다</h1>
+   <!-- 이미지의 사이즈 속성 : 숫자 => pixl--> 
+    <img src="../images/bts.jpg" width="50" height="50">
+    <img src="../images/bts.jpg" width="50%" height="50%">
+    <p></p>
+    
+    <!-- alt + 상하 방향키 : 라인이동 -->
+    <a href="http://www.edam-ent.com/html/sub03/sub03_0301_view">
+        <p>
+            <img src=https://pbs.twimg.com/profile_images/1374979417915547648/vKspl9Et.jpg>
+            아이유 화이팅!
+        </p>
+    </a>
+    <h2>html 문서에 사용되는 이미지의 포맷은 jpg(jpeg), png 가 대표적</h2>
+    <h4>jpg : 손실 압축 포맷 : 이미지의 해상도가 손상되어도 용량을 많이 줄 일 수 있어 가장 많이 사용됨</h4>
+    <h4>png : 무손실 압축 포맷: 이미지의 해상도의 손실을 줄이고 투명배경 이미지를 사용할 필요성이 있을때, 이미지의 용량이 크지만 화질이 뛰어남</h4>
+    <h4>이미지 파일들은 파일의 헤더영역에 image/jpeg, image/png 등의 형식을 갖고 있으므로 파일 확장자 명과 관계없이 헤더 정보로 판단함</h4>
+
+    <!-- 이미지의 리소스가 잘못된 정보값을 갖는 경우 : 엑박이 떴다라고 표현함 -->
+    <img src="../images/bts.jpg" alt="bts 였어">
+    <img src="../images/bts.jpg" alt="bts 였어" width="20%" height="20%" title="BTS IMAGE" >
+</body>
+</html>

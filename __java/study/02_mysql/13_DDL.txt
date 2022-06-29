@@ -1,0 +1,175 @@
+-- DDL (Data Definition Language)
+-- 데이터베이스, 유저, 테이블, 뷰 등등 데이터베이스 관련 객체를 생성 및 삭제하는 명령어
+
+create database test_db;
+drop database test_db;
+
+create table tbl_test (
+tid int auto_increment primary key,
+tname varchar(20) not null,
+price decimal(7,2) default 0.0,
+regdate timestamp default current_timestamp(),
+etc text
+);
+drop table tbl_test;
+desc tbl_test;
+
+create table lecturer (
+lecturer_id int(6) primary key,
+lecturee_name varchar(20) not null,
+course_id int(10)
+);
+
+create table course (
+course_id int(10) primary key,
+course_name varchar(50)
+);
+
+
+insert into course values (1234567890, 'HTML');
+insert into course values (1234567891, 'CSS');
+
+select * from course;
+
+insert into lecturer (lecturer_id, lecturee_name, course_id)
+values (123456, 'KIM', 1234567890);
+
+select * from lecturer;
+
+create table stud_hobby (
+student_id int(8) primary key,
+hobby varchar(100)
+);
+
+create table student(
+STUDENT_ID int(8) primary key,
+STUDENT_NAME varchar(20) not null,
+DOB date not null,
+DOOR int,
+STREET varchar(40),
+CITY varchar(30),
+STATE varchar(20),
+PIN int(5),
+COURSE_ID int(10) not null
+);
+
+alter table lecturer
+add constraint fk_course_id foreign key(course_id)
+references course(course_id);
+
+alter table student
+add constraint fk_course_id_student foreign key(course_id)
+references course(course_id);
+
+alter table stud_hobby
+add constraint fk_student_id foreign key(student_id)
+references student(student_id);
+
+-- DATA TYPE
+-- int(자리수[1~11]=4byte) : 정수형 약 음수 또는 양수 21억4천7백만 까지
+-- tinyint(자리수) : -128 ~ 127
+-- bigint(자리수]) : 약 1844경(음수양수 포함)
+-- varchar(Bytes) : 가변형 문자 (65,535byte) => utf8 => 21,844자
+-- 가변형 문자 : 데이터 크기의 지정 내에서 데이터 크기 할당을 유동적으로 조절하는 타입
+-- text : varchar보다 더 큰 문자
+-- BLOB : Binary Large Object => 대용량 이진 객체 (미변환 파일 저장)
+-- double(총자리수, 소수점 자리수) : 실수형 데이터
+-- decimal(총자리수, 소수점자리수) : 실수형 데이터
+-- datetime, date : 날짜와 시간
+
+create table student(
+STUDENT_ID int(8) primary key,
+STUDENT_NAME varchar(20) not null,
+DOB date not null,
+DOOR int,
+STREET varchar(40),
+CITY varchar(30),
+STATE varchar(20),
+PIN int(5),
+COURSE_ID int(10) not null
+);
+
+-- 테이블 객체 관련 구조 변경
+-- 컬럼명 변경: alter table 테이블명 change old new datatype
+alter table student
+change dob birth datetime;
+desc student;
+
+-- 컬럼 순서 변경
+alter table student
+modify CITY varchar(30) after birth;
+desc student;
+
+-- 컬럼 타입 변경
+alter table student
+modify birth date;
+desc student;
+
+-- 컬럼 default 변경
+alter table student
+alter column birth set default (current_date);
+
+-- 컬럼 추가
+alter table student
+add column std_id int(10) default 0 first;
+desc student;
+
+-- 컬럼 삭제
+alter table student
+drop column std_id;
+desc student;
+
+-- 제약조건 추가
+-- Multiple primary key defined : pk는 두개 설정 하지 않는다.
+alter table student
+add constraint pk_std primary key(pin);
+
+-- unique 설정을 해보자
+alter table student
+add constraint unique (pin);
+
+desc student;
+
+-- key 제거
+alter table stud_hobby drop foreign key fk_student_id;
+
+-- auto increment 설정 : pk에 하는것이 일반적 - 안전한 데이터 구축
+alter table student modify student_id int auto_increment;
+desc student;
+
+alter table student auto_increment = 10;
+
+insert into student (student_id, STUDENT_NAME, COURSE_ID)
+values(1234567, 'LEE', 1234567890);
+select * from student;
+
+insert into student (STUDENT_NAME, COURSE_ID)
+values('LEE', 1234567890);
+select * from student;
+
+delete from student where 1=1;
+select * from student;
+
+insert into student (STUDENT_NAME, COURSE_ID)
+values('LEE', 1234567890);
+
+select * from student;
+delete from student where 1=1;
+
+alter table student auto_increment = 10;
+
+insert into student (STUDENT_NAME, COURSE_ID)
+values('LEE', 1234567890);
+select * from student;
+
+-- auto increment 값 초기화 및 데이터 값 재조정 (데이터를 비우고 하자!)
+truncate student; 
+alter table student auto_increment = 1;
+
+set @count = 0; -- 변수 선언 및 초기화
+update student set student_id = @count := @count + 1;
+
+insert into student (STUDENT_NAME, COURSE_ID)
+values('LEE', 1234567890);
+select * from student;
+

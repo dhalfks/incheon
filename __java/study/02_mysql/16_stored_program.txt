@@ -1,0 +1,95 @@
+-- procedure
+-- 선언부, 실행부로 구성되어 있으며 begin > end로 구분한다
+-- parameter를 통해 프로시저에 값을 전달 할 수 있고 리턴도 가능
+
+drop procedure if exists InsertEmp;
+-- cmd로 mysql 접속 후 데이터베이스 선택
+-- delimiter $$ 부터
+delimiter $$
+create procedure InsertEmp(
+in param_empno int,
+in param_ename varchar(20),
+in param_job varchar(20),
+in param_sal int)
+begin
+	insert into emp_test (empno, ename, job, sal)
+	values (param_empno, param_ename, param_job, param_sal);
+end $$ 
+-- 여기까지 복사 후 붙여넣고 실행
+-- delimiter ; (생략)
+
+-- 다시 여기서부터 실행
+call InsertEmp(9999, 'tester p', 'tester', 2000);
+select * from emp_test;
+
+-- insert시 empno가 존재하면 update로 존재하지 않으면 insert를 수행하는 프로시져
+drop procedure if exists EmpInsertOrUpdate;
+
+delimiter $$
+create procedure EmpInsertOrUpdate(
+param_empno int,
+param_ename varchar(20),
+param_job varchar(20),
+param_sal int)
+begin
+	declare cnt int;
+	select count(empno) into cnt from emp_test
+	where empno = param_empno;
+	if cnt != 0 then
+		set SQL_SAFE_UPDATES=0; /*수정, 삭제 연산에 필요한 설정*/
+		update emp_test 
+			set ename = param_ename, job = param_job, sal = param_sal
+		where empno = param_empno;
+	else
+		insert into emp_test (empno, ename, job, sal)
+		values (param_empno, param_ename, param_job, param_sal);
+	end if;
+end;$$
+delimiter ;
+
+call EmpInsertOrUpdate(9999, 'tester X', 'testerX', 3000);
+call EmpInsertOrUpdate(9997, 'tester A', 'testerA', 1000);
+select * from emp_test;
+
+-- 사용자 정의 함수 : User Defined Function
+set global log_bin_trust_function_creators=on; -- root 권한에서 실행
+flush privileges;
+
+drop function if exists FuncSalAvg;
+
+delimiter $$
+create function FuncSalAvg(
+param_deptno int) returns int
+begin
+	declare dept_avg int;
+	set dept_avg = (select avg(sal) from emp where deptno = param_deptno);
+	return dept_avg;
+end;$$
+delimiter ;
+
+select empno, ename, sal, FuncSalAvg(deptno), deptno
+from emp order by deptno;
+
+-- Trigger : 특정 테이블에 insert, update, delete와 같은 조작이 진행될 때 
+-- 자동으로 특정한 쿼리를 연쇄적으로 실행시키고자 할때 사용함
+set global log_bin_trust_function_creators=on; -- root 권한에서 실행
+flush privileges;
+
+create table if not exists dept_log
+as select * from dept where 1=0;
+
+alter table dept_log add column reg_date date;
+
+delimiter $$
+create trigger AfterDeptInsertLog
+after insert on dept_test for each row 
+begin 
+	insert into dept_log 
+	values (new.deptno, new.dname, new.loc, now());
+end;$$
+
+insert into dept_test values(90, 'WEB', 'SEOUL');
+select * from dept_test;
+select * from dept_log;
+delimiter ;
+

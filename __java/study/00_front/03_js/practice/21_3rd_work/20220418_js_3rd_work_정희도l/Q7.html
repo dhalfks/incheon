@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz 7</title>
+  <style>
+    fieldset table{
+      height: 550px;
+      width: 90%;
+      margin: 0 5%;
+    }
+    button {
+      height: 100%;
+      width: 100%;
+      margin: 5px;
+      font-weight: bold;
+      color: black;
+    }
+    td {
+      height: auto;
+      width: 100px;
+    }
+    #mainPage button {
+      font-size: 4em;
+    }
+    #numberPad button {
+      font-size: 3em;
+    }
+    #textField {
+      font-size: 4em;
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    Q7. 호텔 객실 관리 프로그램 만들기 (도전용)
+  </h1>
+  <ul>
+    <li>
+      5층, 각 층당 10호실, 총 50개의 객실보유한 호텔
+    </li>
+    <li>
+      메뉴버튼 > 객실현황보기, 입실, 퇴실, 초기화 > 클릭하면 기능 수행
+    </li>
+    <li>
+      관리할 호수 입력받고 각 기능 버튼을 클릭하는 프로세스 (간단하게 만들 수 있는 형태)
+    </li>
+    <li>
+      객실현황보기 버튼 > 방번호, 입실시간, 퇴실처리시간, 사용중 or 빈방 이라는 정보 출력
+    </li>
+    <li>
+      입실 > 사용중이면 입실불가, 빈방이면 입실완료 후 방정보 변경처리
+    </li>
+    <li>
+      퇴실 > 빈방이면 퇴실불가, 사용중이면 퇴실완료 후 방정보 변경처리
+    </li>
+    <li>
+      초기화 > 모든 방정보를 리셋
+    </li>
+  </ul>
+
+  <button type="button" style="width: 60px;">
+    <a href="Q7.html" style="text-decoration: none; color: black;">
+      초기화
+    </a>
+  </button>
+    <fieldset>
+      <legend>
+        <a id="a" href="#" style="text-decoration: none; color: black;">
+          <h2 style="margin: 0;">무인 호텔 관리 프로그램</h2>
+          <span style="font-size: 12px;">(여기를 클릭해주시면 메인화면으로 돌아갑니다)</span>
+        </a>
+      </legend>
+    
+      <div id="home" style="margin: 0 auto;">
+
+      </div>
+    </fieldset>
+
+  <script>
+    // rooms infomation DB
+    const rooms = new Map();
+    for(let i = 0; i < 5; i++) {
+      for(let ii = 0; ii < 10; ii++) {
+        rooms.set(`${i+1}0${ii}`, { 'state': '빈 방', 'time': 'Time is "Null"'});
+      };
+    };
+
+    // for main page
+    function main() {
+      getID('home').innerHTML
+       = `<table id="mainPage">
+            <tr>
+              <td colspan="2">
+                <button type="button" id="showRoomInfo">객실 정보</button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button type="button" id="checkIn">입실</button>
+              </td>
+              <td>
+                <button type="button" id="checkOut">퇴실</button>
+              </td>
+            </tr>
+          </table>`
+    };
+    main();
+
+    function getID(id) {
+      return document.getElementById(id);
+    };
+
+    // load all of rooms
+    function allRommsInfo() {
+      let str = "<table>";
+      for(let i = 0; i < 5; i++) {
+        str += '<tr>';
+          for(let ii = 0; ii < 10; ii++) {
+            if(rooms.get((i+1) +'0'+ ii)['state'] == '사용 중') {
+              str += `<td><button id="rm${i+1}0${ii}" type="button" value="${i+1}0${ii}" style="background-color: orange;">
+                ${i+1}0${ii} (${rooms.get((i+1) +'0'+ ii)['state']})<br>
+                ${rooms.get((i+1) +'0'+ ii)['time']}</button></td>`;
+              } else {
+                str += `<td><button id="rm${i+1}0${ii}" type="button" value="${i+1}0${ii}" style="background-color: yellowgreen;">
+                  ${i+1}0${ii} (${rooms.get((i+1) +'0'+ ii)['state']})<br>
+                  ${rooms.get((i+1) +'0'+ ii)['time']}</button></td>`;
+              }
+          }
+        str += '</tr>';
+      }
+      getID('home').innerHTML = str + "</table>";
+    };
+
+    // change each room indivisually
+    function changingRoomState(roomNum) {
+      let str = "", state = rooms.get(roomNum)['state'];
+
+      if(state == '사용 중') {
+          let d = new Date();
+          rooms.set(roomNum, { 'state': '빈 방', 'time': `퇴실 시간 : ${d.getHours()}:${d.getMinutes()}` });
+          getID(`rm${roomNum}`).style.backgroundColor='yellowgreen'
+          str = `${roomNum} (${rooms.get(roomNum)['state']})<br>
+                ${rooms.get(roomNum)['time']}`;
+        } else {
+          let d = new Date();
+          rooms.set(roomNum, { 'state': '사용 중', 'time': `입실 시간 : ${d.getHours()}:${d.getMinutes()}` });
+          getID(`rm${roomNum}`).style.backgroundColor='orange'
+          str = `${roomNum} (${rooms.get(roomNum)['state']})<br>
+                ${rooms.get(roomNum)['time']}`;
+        }
+        return str;
+    }
+
+    // number pad for checking-in or out
+    function numberPad(inOut) {
+      let str = "";
+      if(inOut == 'checkIn') {
+        inOut = '입실'
+      } else {
+        inOut = '퇴실'
+      }
+      str
+       = `<table id=numberPad>
+            <h2 id='whereIs'>${inOut}</h2>
+            <tr>
+              <td colspan="3" id="textField" style="text-align: center;">0</td>
+            </tr>
+            <tr>
+              <td><button type="button" value="7">7</button></td>
+              <td><button type="button" value="8">8</button></td>
+              <td><button type="button" value="9">9</button></td>
+            </tr>
+            <tr>
+              <td><button type="button" value="4">4</button></td>
+              <td><button type="button" value="5">5</button></td>
+              <td><button type="button" value="6">6</button></td>
+            </tr>
+            <tr>
+              <td><button type="button" value="1">1</button></td>
+              <td><button type="button" value="2">2</button></td>
+              <td><button type="button" value="3">3</button></td>
+            </tr>
+            <tr>
+              <td><button type="button" id="delete">Del</button></td>
+              <td><button type="button" value="0">0</button></td>
+              <td><button type="button" id="confirm">확인</button></td>
+            </tr>
+          </table>`
+
+      return str;
+    }
+
+    // insert a number on the number pad
+    function inputNumpad(roomNum) {
+      let str = "";
+      if(getID('textField').innerText == "0" || isNaN(getID('textField').innerText)) {
+          str = roomNum;
+        } else if(!isNaN(getID('textField').innerText)) {
+          str = getID('textField').innerText;
+          str += roomNum;
+        } else {
+          console.log('inputnum err : ', roomNum)
+        }
+      return str;
+    }
+
+    // delete last number of showed on the number pad
+    function textfieldDlt() {
+      let textfield = getID('textField').innerText
+      if(textfield == "0") {
+        textfield = "0"
+      } else if(!isNaN(textfield)) {
+        textfield.length != 1
+         ? textfield = textfield.substring(0, textfield.length -1)
+         : textfield = "0"
+      } else {
+        console.log('delete err : ', textfield);
+        textfield = "0"
+      }
+      return textfield;
+    }
+    
+    // confirming check-in or check-out
+    function cnfirm(roomNum) {
+      let whereIs = getID('whereIs').innerText;
+      let str = "정확한 방 번호를 입력해주세요";
+      let d = new Date();
+      console.log(roomNum);
+
+
+      if(!rooms.has(roomNum)) {
+        str = '정확한 방 번호를 입력해주세요';
+      } else {
+        if(whereIs == "입실") {
+          if(rooms.get(roomNum)['state'] == '빈 방') {
+            str = `${roomNum}호 "<span style="color:yellowgreen">입실 확인</span>"되었습니다`
+            rooms.set(roomNum, { 'state': '사용 중', 'time': `입실 시간 : ${d.getHours()}:${d.getMinutes()}` });
+          } else {
+            str = `${roomNum}호는 이미 "<span style="color:orange">사용 중</span>" 입니다`;
+          }
+        } else if(whereIs == "퇴실") {
+          if(rooms.get(roomNum)['state'] != '빈 방') {
+            str = `${roomNum}호 "<span style="color:yellowgreen">퇴실 확인</span>"되었습니다`
+            rooms.set(roomNum, { 'state': '빈 방', 'time': `퇴실 시간 : ${d.getHours()}:${d.getMinutes()}` });
+          } else {
+            str = `${roomNum}호는 이미 "<span style="color:orange">빈 방</span>" 입니다`;
+          }
+        } else {
+          console.log('whereIs ', whereIs);
+        }
+      }
+      return str
+    }
+
+    // return to the home
+    getID('a').addEventListener('click', main);
+
+    // event configuration of every single button
+    getID('home').addEventListener('click', function(e) {
+      let roomNum = e.target.value;
+      let bntID = e.target.id;
+      let str = "";
+
+      // misclicking filtering
+      if(roomNum == undefined) {
+        console.log('wrong e.target.value');
+
+      } else if(parseInt(roomNum) > 99) {
+        // changing the room state when push each button of room on the showing all rooms
+        str = changingRoomState(roomNum);
+        getID(`rm${roomNum}`).innerHTML = str;
+
+        // input a number on number pad for making a room number
+      } else if(parseInt(roomNum) < 10) {
+        getID('textField').innerHTML = inputNumpad(roomNum);
+
+
+      } else if(isNaN(bntID)) {
+        if(bntID == 'checkIn') {
+          // loading the numberPad for checking-in
+          getID('home').innerHTML = numberPad(bntID);
+        } else if(bntID == 'checkOut') {
+          // loading the numberPad for checking-out
+          getID('home').innerHTML = numberPad(bntID);
+
+        } else if(bntID == 'delete') {
+          // erased last number of 'text field' when push the delete button
+          getID('textField').innerHTML = textfieldDlt();
+        } else if(bntID == 'confirm') {
+          // checking in & out
+          getID('textField').innerHTML = cnfirm(getID('textField').innerText);
+        }else if(bntID == 'showRoomInfo') {
+          // loading button all of rooms' status
+          allRommsInfo();
+        } else {
+          console.log(bntID);
+          console.log('occured exception');
+        }
+      
+
+      } else if(roomNum == "") {
+        console.log('empty');
+      } else {
+        console.log('occured exception');
+      }
+    });
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+-- index 생성
+create index idx_sal on emp (sal);
+
+create table dept_copy (
+deptno int,
+dname varchar(20),
+loc varchar(30),
+nation int(4),
+primary key(deptno),
+index idx_nation (nation)
+);
+
+alter table dept_copy add index idx_loc (loc);
+
+-- index 조회
+show index from dept_copy;
+
+-- index 삭제
+alter table dept_copy drop index idx_loc;
+
+show index from dept_copy;
+
+-- index 수정
+-- 인덱스의 수정은 삭제 후 생성으로!!!
+
+-- student.student_id를 stud_hobby에서 fk로 사용할 것이다
+alter table stud_hobby 
+add constraint fk_student_id foreign key(student_id)
+references student(student_id)
+on delete no action on update set default;
+-- on delete ? on update ?
+-- restrict : 제한(취소시킴)
+-- cascade : 연동하여 같이 진행 => on update에서 많이 사용
+-- no action : 변동 없음 => on delete에서 많이 사용
+-- set null : null 변경
+-- set default : 컬럼의 default 값으로 변경

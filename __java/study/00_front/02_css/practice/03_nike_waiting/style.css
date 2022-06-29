@@ -1,0 +1,40 @@
+.container {
+  width: 75%;
+  height: 748px;
+  margin: auto;
+  background-image: url("images/bg_nike.jpg");  
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 100%;
+  text-align: center;  
+}
+.cover {
+  width: 100%;  
+  background-color: rgba(0, 0, 0, 0.5);
+  padding-top: 275px;
+  padding-bottom: 230px;
+}
+.inner {
+  width: 60%;
+  background-color: white;
+  margin: auto;  
+}
+.inner > h2 {
+  margin-bottom: 3px;
+}
+img {  
+  width: 7%;
+  margin-top: 20px;
+}
+.inner > p {
+  font-size: 0.5em;
+  margin-bottom: 20px;
+}
+.bt {
+  border-top: 1px solid #999;
+  background-color: #eee;
+  padding-bottom: 10px;
+}
+.bt > p {
+  font-size: 0.25em;
+}

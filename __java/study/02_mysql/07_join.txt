@@ -1,0 +1,185 @@
+-- JOIN
+-- 두 개 이상의 테이블을 병합하여 출력하는 기법
+
+select * from emp;
+select * from dept;
+
+-- equi join
+-- 1. 조인에 사용되는 컬럼의 데이터와 연산의 결과값이 유의미해야 함
+select * from emp, dept
+where emp.deptno = dept.deptno;
+
+-- 2. 출력되는 데이터의 정리 : 컬럼이 많으면 출력한 결과를 파악하기 힘듬
+-- 각 사원들이 어느 지역에서 근무하는지 알고 싶다?
+select empno, ename, loc
+from emp, dept
+where emp.deptno = dept.deptno;
+
+-- 조인 조건에 사용된 컬럼을 출력하려면 반드시 어느 테이블 소속인지 명시해야 함
+select empno, ename, emp.deptno, dname, loc 
+from emp, dept
+where emp.DEPTNO = dept.DEPTNO;
+
+-- 테이블에 alias를 적용하여 쿼리 작성에 효율성을 높일 수 있다
+select empno, ename, e.DEPTNO, dname, loc
+from emp e, dept d
+where e.DEPTNO = d.DEPTNO;
+
+-- 3개의 테이블을 조인을 하려면?
+select e.empno, e.ename, e.mgr, e.DEPTNO,
+dname, loc,
+e2.empno, e2.ename as mgr_name
+from emp e, dept d, emp e2
+where e.DEPTNO = d.DEPTNO
+and e.MGR = e2.EMPNO;
+
+-- 조인문에 조건 추가하기
+select empno, ename, sal, dname, loc
+from emp, dept 
+where emp.DEPTNO = dept.DEPTNO
+and sal > 1000;
+
+-- non equi join
+select * from salgrade;
+select empno, sal from emp;
+
+select empno, sal, grade, losal, hisal
+from emp, salgrade
+where sal between losal and hisal;
+
+-- ANSI JOIN Syntax
+select empno, ename, dname, loc
+from emp, dept
+where emp.DEPTNO = dept.DEPTNO;
+
+select empno, ename, dname, loc
+from emp inner join dept 
+on emp.DEPTNO = DEPT.DEPTNO
+where sal > 1000;
+
+select empno, sal, grade, losal, hisal
+from emp inner join salgrade
+on sal between losal and hisal;
+
+-- inner는 생략해도 된다
+select empno, ename, dname, loc
+from emp join dept 
+on emp.DEPTNO = DEPT.DEPTNO
+where sal > 1000;
+
+-- natural inner join => inner 생략 가능
+-- 같은 이름의 컬럼을 inner join 하는 내부연산이 이루어짐
+select empno, ename, dname, loc
+from emp natural join dept
+where sal > 1000;
+
+-- natural join과 비슷한 기능인 using 연산자
+select empno, ename, dname, loc
+from emp join dept using (deptno)
+where sal > 1000;
+
+-- outer join : 차집합, 합집합
+-- outer join은 기준이 되는 데이터에 맞는 row가 없으면 null로 다른 컬럼의 데이터를 채운다
+-- left [outer] join
+
+select empno, ename, e.DEPTNO, d.DEPTNO, dname, loc
+from emp e left join dept d
+on e.DEPTNO = d.DEPTNO;
+
+-- right [outer] join
+select empno, ename, e.DEPTNO, d.DEPTNO, dname, loc
+from emp e right join dept d
+on e.DEPTNO = d.DEPTNO;
+
+-- MySQL은 full outer join 이라는 키워드를 지원하지 않는다
+-- union 이라는 집합 연산자를 이용하여 같은 데이터 셋을 만드는 방법을 선택해야 함
+create table if not exists emp_test as select * from emp;
+select * from emp_test;
+insert into emp_test (empno, ename) values (9999,'Kim');
+insert into emp_test (empno, ename) values (8888,'Lee');
+insert into emp_test (empno, ename) values (7777,'Park');
+
+create table if not exists dept_test as select * from dept;
+select * from dept_test;
+insert into dept_test (deptno, dname) values (100, 'Testers');
+insert into dept_test (deptno, dname) values (200, 'Delivery');
+
+select empno, ename, e.deptno, dname, loc 
+from emp_test e left outer join dept_test d 
+on e.DEPTNO = d.deptno;
+
+select empno, ename, d.deptno, dname, loc 
+from emp_test e right outer join dept_test d 
+on e.DEPTNO = d.deptno;
+
+-- MySQL 불가능
+select empno, ename, d.deptno, dname, loc 
+from emp_test e full outer join dept_test d 
+on e.DEPTNO = d.deptno;
+
+select empno, ename, e.deptno, d.deptno, dname, loc 
+from emp_test e left outer join dept_test d 
+on e.DEPTNO = d.deptno
+union
+select empno, ename, e.deptno, d.deptno, dname, loc 
+from emp_test e right outer join dept_test d 
+on e.DEPTNO = d.deptno;
+
+-- 07_join_Q2
+-- SQL-99 이전 방식
+SELECT D.DEPTNO,
+       D.DNAME,
+       TRUNC(AVG(SAL)) AS AVG_SAL,
+       MAX(SAL) AS MAX_SAL,
+       MIN(SAL) AS MIN_SAL,
+       COUNT(*) AS CNT
+  FROM EMP E, DEPT D
+ WHERE E.DEPTNO = D.DEPTNO
+GROUP BY D.DEPTNO, D.DNAME;
+
+-- ANSI
+SELECT DEPTNO,
+       D.DNAME,
+       TRUNC(AVG(SAL)) AS AVG_SAL,
+       MAX(SAL) AS MAX_SAL,
+       MIN(SAL) AS MIN_SAL,
+       COUNT(*) AS CNT
+  FROM EMP E JOIN DEPT D USING (DEPTNO)
+GROUP BY DEPTNO, D.DNAME;
+
+-- 07_join_Q3
+-- SQL-99 이전 방식 (ORACLE 만 허용)
+SELECT D.DEPTNO, D.DNAME, E.EMPNO, E.ENAME, E.JOB, E.SAL
+  FROM EMP E, DEPT D
+ WHERE E.DEPTNO(+) = D.DEPTNO
+ORDER BY D.DEPTNO, E.ENAME;
+
+-- ANSI
+SELECT D.DEPTNO, D.DNAME, E.EMPNO, E.ENAME, E.JOB, E.SAL
+  FROM EMP E RIGHT OUTER JOIN DEPT D ON (E.DEPTNO = D.DEPTNO)
+ORDER BY D.DEPTNO, E.ENAME;
+
+-- 07_join_Q4
+-- ANSI
+SELECT D.DEPTNO, D.DNAME,
+       E.EMPNO, E.ENAME, E.MGR, E.SAL, E.DEPTNO,
+       S.LOSAL, S.HISAL, S.GRADE,
+       E2.EMPNO AS MGR_EMPNO, E2.ENAME AS MGR_ENAME
+  FROM EMP E RIGHT OUTER JOIN DEPT D
+                ON (E.DEPTNO = D.DEPTNO)
+              LEFT OUTER JOIN SALGRADE S
+                ON (E.SAL BETWEEN S.LOSAL AND S.HISAL)
+              LEFT OUTER JOIN EMP E2
+                ON (E.MGR = E2.EMPNO)
+ORDER BY D.DEPTNO, E.EMPNO;
+
+-- SQL-99 이전 방식 (ORACLE 만 허용)
+SELECT D.DEPTNO, D.DNAME,
+       E.EMPNO, E.ENAME, E.MGR, E.SAL, E.DEPTNO,
+       S.LOSAL, S.HISAL, S.GRADE,
+       E2.EMPNO AS MGR_EMPNO, E2.ENAME AS MGR_ENAME
+  FROM EMP E, DEPT D, SALGRADE S, EMP E2
+ WHERE E.DEPTNO(+) = D.DEPTNO
+   AND E.SAL BETWEEN S.LOSAL(+) AND S.HISAL(+)
+   AND E.MGR = E2.EMPNO(+)
+ORDER BY D.DEPTNO, E.EMPNO;

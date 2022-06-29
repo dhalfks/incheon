@@ -1,0 +1,75 @@
+-- View
+-- 물리적 테이블에 근거한 논리 가상 테이블
+-- 실질적인 데이터 저장방식이 아니라 
+-- 마치 테이블을 사용하는 것처럼 동일한 데이터베이스 객체를 만듬
+
+-- with read only : Oracle만 가능
+-- MySQL은 user에게 view의 권한을 select만 주는 것으로 제어해야 함
+
+create or replace view v_emp
+as select * from emp;
+
+show create view v_emp;
+
+insert into v_emp (empno, ename, sal)
+values (1111, 'tester', 10000);
+
+select * from emp;
+delete from emp where empno = 1111;
+
+-- view를 select만 사용하기로 가정
+use soccer_db;
+create or replace view v_player_team as
+select p.player_name, p.position, p.back_no, p.team_id, t.team_name
+from player p join team t 
+on p.TEAM_ID = t.TEAM_ID;
+
+select * from v_player_team;
+
+-- 뷰의 장점
+-- 독립성 : 테이블 구조가 변경되어도 뷰를 사용하는 응용프로그램은 변경하지 않아도 됨
+-- 편리성 : 자주 사용하거나 복잡한 쿼리를 미리 생성하여 편리하게 사용할 수 있음
+-- 보안성 : 직원의 급여정보 등의 민감한 데이터를 뷰를 생성할 때마다 조정하여 사용자에게 제공가능
+
+use sqlclass;
+drop view v_emp;
+
+-- 기본 테이블은 emp_copy로 합니다. 20번 부서에 소속된 사원들의 사번과 이름, 부서번호와 상관의 사번을 출력하기 위한 select문을 emp_view20이라는이름의 뷰로 정의 해보세요.
+-- by 이병인
+create or replace view emp_view20
+as 
+select EMPNO as '사번', ENAME as '이름', DEPTNO as '부서번호', MGR as '상관의사번'
+from emp
+where DEPTNO = 20;
+
+select * from emp_view20;
+
+-- 각 부서별 최대 급여와 최소 급여를 출력하는 뷰를 sal_view라는 이름으로 작성해 보세요.
+-- by 최성열
+create or replace view  v_sal_view as
+select  DEPTNO ,max(SAL), min(sal)  
+from emp 
+group by DEPTNO;
+select * from v_sal_view;
+
+-- 위의 문제에서 작성한 emp_view20 뷰에 한글로 별칭을 추가하여 뷰를 변경해 보세요.
+create or replace view emp_view20
+(사원번호, 사원명, 부서번호, 상관번호)
+as select empno, ename, deptno, mgr
+from emp where deptno = 20;
+
+select * from emp_view20;
+
+-- 인라인 뷰를 사용하여 급여를 많이 받는 순서대로 3명만 출력하는 뷰를 작성하세요. (뷰 이름 : sal_top3_view)
+-- by 한경찬
+create or replace view sal_top3_view
+as select * from emp 
+order by sal desc
+limit 3;
+
+create or replace view sal_top3_view
+as select * from (select empno, ename, sal from emp) e
+order by e.sal desc
+limit 3;
+
+select * from sal_top3_view;

@@ -1,0 +1,33 @@
+1. 지정폴더에 mysql 압축해제, system path 등록 후 cmd 관리자권한 실행
+
+2. mysqld --initialize-insecure
+
+3. mysqld --install
+
+4. net start mysql
+
+5. mysql -uroot -p (초기 비밀번호는 없음 > 엔터)
+
+6. mysql> use mysql
+
+7. mysql> ALTER user 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'mysql';
+
+8. mysql> flush privileges;
+
+9. exit
+
+10. 변경된 비밀번호로 재접속 > mysql -uroot -pmysql
+
+11. create database javadb;
+
+12. use mysql;
+
+13. create user 'javauser'@'localhost' identified by 'mysql';
+
+14. grant all privileges on javadb.* to 'javauser'@'localhost' with grant option;
+
+15. flush privileges;
+
+16. mysql -ujavauser -pmysql
+
+17. show databases;

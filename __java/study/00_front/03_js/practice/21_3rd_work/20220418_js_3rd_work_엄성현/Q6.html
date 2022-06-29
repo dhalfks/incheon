@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz 6</title>
+  <style>
+    table {
+      border: 1px solid black;
+      border-collapse: collapse;
+      width: 70%;
+    }
+    td, th {
+      border-bottom: 1px solid black;
+      min-width: 80px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    Q6. 데이터를 입력할 인원수를 입력받고, 각 개인의 HTML, CSS, JS 과목의 점수를 입력하면 각 과목 점수, 총점, 평균을 html의 리스트나 table 태그에 출력하기 (과제용)
+  </h1>
+  <p>
+    인원수 : <input type="number" id="peopleNum"><button id="peopleBtn">실행</button>
+  </p>
+  <div id="inputArea"></div>
+  <button id="sbmBtn">제출</button><br>
+  <div id="printArea">
+    <table id="printTable">
+
+    </table>
+  </div>
+  <script>
+    document.getElementById('peopleBtn').addEventListener('click', generate);
+    let people = 0;
+    function generate() {
+      document.getElementById('inputArea').innerHTML = '';
+      people = parseInt(document.getElementById('peopleNum').value);
+      for (let i = 0; i < people; i++) {
+        document.getElementById('inputArea').innerHTML += `이름 : <input type="text" id="stu${i}">, HTML : <input type="number" id="stu${i}_html">, CSS : <input type="number" id="stu${i}_css">, JS : <input type="number" id="stu${i}_js"><br>`
+      };
+      document.getElementById('printTable').innerHTML = '';
+      // document.getElementById('peopleBtn').disabled = true;
+    };
+    
+    const allScore = new Map();
+    document.getElementById('sbmBtn').addEventListener('click', sendData);
+    function sendData() {
+      allScore.clear();
+      for (let i = 0; i < people; i++) {
+        let name = document.getElementById(`stu${i}`).value;
+        let myScore = [];
+        myScore.push(parseFloat(document.getElementById(`stu${i}_html`).value));
+        myScore.push(parseFloat(document.getElementById(`stu${i}_css`).value));
+        myScore.push(parseFloat(document.getElementById(`stu${i}_js`).value));
+        allScore.set(name,myScore);
+        // document.getElementById('sbmBtn').disabled = true;
+        calc();
+      };
+    };
+
+    function calc() {
+      document.getElementById('printTable').innerHTML = "<tr><th>이름</th><th>HTML</th><th>CSS</th><th>JS</th><th>Total</th><th>Avg</th><th>Grade</th></tr>"
+      allScore.forEach(function(value, key, self){
+        let avg = (value[0]+value[1]+value[2])/3
+        let grade = '';
+        if (avg >= 90) {
+          grade = 'A'
+        } else if (avg >= 80) {
+          grade = 'B'
+        } else if (avg >= 70) {
+          grade = 'C'
+        } else if (avg >= 60) {
+          grade = 'D'
+        } else {
+          grade = 'F'
+        }
+        document.getElementById('printTable').innerHTML += `<tr><td>${key}</td><td>${value[0]}</td><td>${value[1]}</td><td>${value[2]}</td><td>${value[0]+value[1]+value[2]}</td><td>${avg.toFixed(2)}</td><td>${grade}</td></tr>`
+      })
+    };
+  </script>
+</body>
+</html>

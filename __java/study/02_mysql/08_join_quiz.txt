@@ -1,0 +1,89 @@
+-- soccer_db
+Q1. K리그 팀의 연고지, 팀명, 경기장ID, 경기장명, 좌석수를 출력하세요.
+
+Q2. K리그 팀의 선수명, 포지션, 연고지, 팀명, 경기장명을 출력하세요.
+
+Q3. 경기장 ID를 이용하여 팀이름, 경기장ID, 경기장명을 경기장ID 순으로 출력하세요.
+   홈팀이 없는 경기장은 출력하지 않는다
+
+Q4. GK 포지션의 선수별 연고지명, 팀명, 구장명을 선수명 순으로 출력하세요.
+
+Q5. 홈팀이 3점 이상 차이로 승리한 경기의 경기장 이름, 경기장ID, 경기 일정, 홈팀 이름, 원정팀 이름, 홈팀 점수, 원정팀 점수를 출력하세요.
+
+Q6. STADIUM 테이블에 등록된 경기장 중에는 홈팀이 없는 곳도 있다.
+     홈팀이 없는 경기장의 정보도 같이 출력하세요.
+     - 출력 칼럼 : 경기장명, 경기장ID, 좌석수, 홈팀ID, 팀명
+     - 홈팀 ID 순으로 출력.
+
+
+
+-- Q1.
+-- by 최성열
+select t.REGION_NAME as 연고지, t.TEAM_NAME as 팀명, t.E_TEAM_NAME as 영문팀명,
+s.STADIUM_ID as "경기장 ID", s.STADIUM_NAME as 경기장명, s.SEAT_COUNT as 좌석수 
+from team t inner join stadium s
+on t.TEAM_ID = s.HOMETEAM_ID;
+
+-- Q2.
+-- by 한경찬
+select p.PLAYER_NAME as 선수명, p.`POSITION` as 선수명, 
+t.REGION_NAME as 연고지명, t.TEAM_NAME as 팀명, s.STADIUM_NAME as 경기장명 
+from stadium s, player p, team t 
+where t.TEAM_ID = p.TEAM_ID and  t.STADIUM_ID = s.STADIUM_ID;
+
+select p.PLAYER_NAME as 선수명, p.`POSITION` as 선수명, 
+t.REGION_NAME as 연고지명, t.TEAM_NAME as 팀명, s.STADIUM_NAME as 경기장명
+from player p join team t 
+on p.TEAM_ID = t.TEAM_ID 
+join stadium s 
+on t.STADIUM_ID = s.STADIUM_ID;
+
+-- Q3.
+-- by 정희도 : inner join 사용가능
+SELECT t.TEAM_NAME, s.STADIUM_ID, s.STADIUM_NAME
+FROM STADIUM s RIGHT JOIN TEAM t
+ON s.STADIUM_ID = t.STADIUM_ID
+ORDER BY 2;
+
+SELECT t.TEAM_NAME, s.STADIUM_ID, s.STADIUM_NAME
+FROM STADIUM s JOIN TEAM t
+using (STADIUM_ID)
+ORDER BY 2;
+
+-- 두 테이블에 같은 이름의 컬럼이 두 개 이상이면 내츄럴 조인 불가
+SELECT t.TEAM_NAME, s.STADIUM_ID, s.STADIUM_NAME
+FROM STADIUM s natural JOIN TEAM t
+ORDER BY 2;
+
+desc stadium;
+desc team;
+
+-- Q4.
+select p.PLAYER_NAME, t.REGION_NAME, t.TEAM_NAME , s.STADIUM_NAME 
+from player p join team t 
+on p.TEAM_ID = t.TEAM_ID 
+join stadium s 
+on t.STADIUM_ID = s.STADIUM_ID 
+where p.`POSITION` = 'GK'
+order by 1;
+
+-- Q5.
+show tables;
+desc schedule;
+
+select st.STADIUM_NAME, st.STADIUM_ID, sc.SCHE_DATE,
+ht.TEAM_NAME, aw.TEAM_NAME, sc.HOME_SCORE, sc.AWAY_SCORE
+from schedule sc join stadium st
+on sc.STADIUM_ID = st.STADIUM_ID 
+join team ht
+on sc.HOMETEAM_ID = ht.TEAM_ID 
+join team aw
+on sc.AWAYTEAM_ID = aw.TEAM_ID 
+where sc.HOME_SCORE >= sc.AWAY_SCORE + 3;
+
+-- Q6.
+select s.STADIUM_NAME, s.STADIUM_ID, 
+s.SEAT_COUNT, s.HOMETEAM_ID, t.TEAM_NAME
+from stadium s left join team t 
+on s.HOMETEAM_ID = t.TEAM_ID 
+order by 4;
